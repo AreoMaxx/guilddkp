@@ -489,7 +489,17 @@ function displayDKPForGuildedClass(classname)
         local name = ""
         local realm = ""
         name, realm = player:match("([^,]+)%-([^,]+)")
+		
+		
 		local _, _, dkp = string.find(officerNote, "<(-?%d*)>")
+		
+		
+		-- Change empty string to 0
+		if (dkp == nil or dkp == '') then
+				dkp = 0
+		end
+		
+		
 
 		if class == classname then
 			classCount = classCount + 1
@@ -498,19 +508,23 @@ function displayDKPForGuildedClass(classname)
 	end
 	
 	-- Then Sort the DKP list with highest DKP in top.
-	local doSort = true
-	while doSort do
-		doSort = false
+	-- Implemented bubble sorting
+	
+	local hasChanged
+	repeat
+		hasChanged = false
 		for n=1,table.getn(classMembers) - 1,1 do
 			local a = classMembers[n]
 			local b = classMembers[n + 1]
 			if tonumber(a[2]) and tonumber(b[2]) and tonumber(a[2]) < tonumber(b[2]) then
 				classMembers[n] = b
 				classMembers[n + 1] = a
-				doSort = true
+				hasChanged = true
 			end
 		end
-	end
+		until hasChanged == false
+	
+
 
 	--	Last, display the results (up to MAX members)
 	if table.getn(classMembers) > 0 then
@@ -518,6 +532,7 @@ function displayDKPForGuildedClass(classname)
 		if classCount > maxClassMembersShown then
 			classCount = maxClassMembersShown
 		end
+	
 		
 		GuildDKP_Echo("Showing "..classCount.." out of "..totalCount.." "..classname.."s:")
 		for n=1,classCount,1 do
